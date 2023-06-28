@@ -20,7 +20,17 @@ export const buscarHistoricoPorAno = (ano) => {
 
 export const calcularInflacao = (valor, dataInicialMes, dataInicialAno, dataFinalMes, dataFinalAno) => {
   const historicoFiltrado = historicoInflacao.filter(
-    historico => (historico.ano === dataInicialAno && historico.mes >= dataInicialMes) || (dataInicialAno < historico.ano && historico.ano < dataFinalAno) || (historico.ano === dataFinalAno && historico.mes <= dataFinalMes)
+    historico => {
+      if (dataInicialAno === dataFinalAno) {
+        return historico.ano === dataInicialAno && historico.mes >= dataInicialMes && historico.mes <= dataFinalMes;
+      } else {
+        return (
+          (historico.ano === dataInicialAno && historico.mes >= dataInicialMes) ||
+          (historico.ano > dataInicialAno && historico.ano < dataFinalAno) ||
+          (historico.ano === dataFinalAno && historico.mes <= dataFinalMes)
+        );
+      }
+    }
   );
 
   let taxasMensais = 1;
@@ -33,9 +43,9 @@ export const calcularInflacao = (valor, dataInicialMes, dataInicialAno, dataFina
 };
 
 export const validacaoErro = (valor, dataInicialMes, dataInicialAno, dataFinalMes, dataFinalAno) => {
-  const anoLimiteFinal = historicoInflacao[historicoInflacao.length-1].ano;
+  const anoLimiteFinal = historicoInflacao[historicoInflacao.length - 1].ano;
   const anoLimiteInicial = historicoInflacao[0].ano
-  const mesLimiteFinal = historicoInflacao[historicoInflacao.length-1].mes;
+  const mesLimiteFinal = historicoInflacao[historicoInflacao.length - 1].mes;
   if (
     isNaN(valor) ||
     isNaN(dataInicialMes) ||
@@ -46,8 +56,8 @@ export const validacaoErro = (valor, dataInicialMes, dataInicialAno, dataFinalMe
     dataInicialAno < anoLimiteInicial || dataInicialAno > anoLimiteFinal ||
     dataFinalMes < 1 || dataFinalMes > 12 ||
     dataFinalAno < anoLimiteInicial || dataFinalAno > anoLimiteFinal ||
-    (dataFinalAno ===  anoLimiteFinal && dataFinalMes > mesLimiteFinal)|| 
-    dataFinalAno < dataInicialAno || 
+    (dataFinalAno === anoLimiteFinal && dataFinalMes > mesLimiteFinal) ||
+    dataFinalAno < dataInicialAno ||
     (dataFinalAno == dataInicialAno && dataFinalMes < dataInicialMes)
   ) {
     return true;
